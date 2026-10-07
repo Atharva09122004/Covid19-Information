@@ -436,4 +436,125 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Comment Form & Character Counter Setup (Module 7)
+    const commentForm = document.getElementById('commentForm') || document.getElementById('editCommentForm');
+    if (commentForm) {
+        const commentTextarea = document.getElementById('comment');
+        const charCounter = document.getElementById('charCounter');
+
+        if (commentTextarea) {
+            const updateCounter = () => {
+                const len = commentTextarea.value.length;
+                if (charCounter) charCounter.textContent = len;
+            };
+
+            commentTextarea.addEventListener('input', updateCounter);
+            updateCounter();
+
+            function validateCommentField() {
+                const val = commentTextarea.value.trim();
+                if (!val || val.length < 3) {
+                    return setFieldError(commentTextarea, 'commentError', 'Comment must contain at least 3 characters.');
+                }
+                if (val.length > 1000) {
+                    return setFieldError(commentTextarea, 'commentError', 'Comment cannot exceed 1000 characters.');
+                }
+                return setFieldError(commentTextarea, 'commentError', '');
+            }
+
+            commentTextarea.addEventListener('blur', validateCommentField);
+
+            commentForm.addEventListener('submit', (e) => {
+                const isCommentOk = validateCommentField();
+                if (!isCommentOk) {
+                    e.preventDefault();
+                    commentTextarea.focus();
+                }
+            });
+        }
+    }
+
+    // Search Form Setup (Module 8)
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        const searchInput = document.getElementById('searchInput');
+
+        searchForm.addEventListener('submit', (e) => {
+            if (searchInput) {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            }
+        });
+    }
+
+    // Contact Form Setup (Module 10)
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const subjectInput = document.getElementById('subject');
+        const messageTextarea = document.getElementById('message');
+        const msgCharCounter = document.getElementById('msgCharCounter');
+
+        const regexName = /^[A-Za-z ]{2,100}$/;
+        const regexEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+        if (messageTextarea && msgCharCounter) {
+            const updateMsgCounter = () => {
+                msgCharCounter.textContent = messageTextarea.value.length;
+            };
+            messageTextarea.addEventListener('input', updateMsgCounter);
+            updateMsgCounter();
+        }
+
+        function validateContactName() {
+            const val = nameInput.value.trim();
+            if (!val) return setFieldError(nameInput, 'nameError', 'Full Name is required.');
+            if (!regexName.test(val)) return setFieldError(nameInput, 'nameError', 'Full Name must contain only letters and spaces (2 to 100 characters).');
+            return setFieldError(nameInput, 'nameError', '');
+        }
+
+        function validateContactEmail() {
+            const val = emailInput.value.trim();
+            if (!val) return setFieldError(emailInput, 'emailError', 'Email address is required.');
+            if (!regexEmail.test(val)) return setFieldError(emailInput, 'emailError', 'Please enter a valid email address.');
+            return setFieldError(emailInput, 'emailError', '');
+        }
+
+        function validateContactSubject() {
+            const val = subjectInput.value.trim();
+            if (!val) return setFieldError(subjectInput, 'subjectError', 'Subject is required.');
+            if (val.length > 200) return setFieldError(subjectInput, 'subjectError', 'Subject cannot exceed 200 characters.');
+            return setFieldError(subjectInput, 'subjectError', '');
+        }
+
+        function validateContactMessage() {
+            const val = messageTextarea.value.trim();
+            if (!val || val.length < 10) return setFieldError(messageTextarea, 'messageError', 'Message must contain at least 10 characters.');
+            if (val.length > 2000) return setFieldError(messageTextarea, 'messageError', 'Message cannot exceed 2000 characters.');
+            return setFieldError(messageTextarea, 'messageError', '');
+        }
+
+        if (nameInput) nameInput.addEventListener('blur', validateContactName);
+        if (emailInput) emailInput.addEventListener('blur', validateContactEmail);
+        if (subjectInput) subjectInput.addEventListener('blur', validateContactSubject);
+        if (messageTextarea) messageTextarea.addEventListener('blur', validateContactMessage);
+
+        contactForm.addEventListener('submit', (e) => {
+            const isNameOk = validateContactName();
+            const isEmailOk = validateContactEmail();
+            const isSubjOk = validateContactSubject();
+            const isMsgOk = validateContactMessage();
+
+            if (!isNameOk || !isEmailOk || !isSubjOk || !isMsgOk) {
+                e.preventDefault();
+                const firstInvalid = contactForm.querySelector('.invalid-field');
+                if (firstInvalid) firstInvalid.focus();
+            }
+        });
+    }
 });

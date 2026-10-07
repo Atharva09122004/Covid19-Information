@@ -33,8 +33,14 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="index.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">Home</a>
                 <a href="covid-info.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'covid-info.php') ? 'active' : ''; ?>">COVID Information</a>
                 <a href="statistics.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'statistics.php') ? 'active' : ''; ?>">COVID Statistics</a>
+                <a href="search.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'search.php') ? 'active' : ''; ?>">Search</a>
+                <a href="comments.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'comments.php') ? 'active' : ''; ?>">Comments</a>
+                <a href="contact.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'active' : ''; ?>">Contact</a>
                 
                 <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <a href="admin/dashboard.php" class="nav-link" style="color: #ef4444; font-weight: 700;">⚙️ Admin</a>
+                    <?php endif; ?>
                     <a href="dashboard.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'active' : ''; ?>">Dashboard</a>
                     <a href="logout.php" class="nav-link nav-btn">Logout (<?php echo htmlspecialchars($_SESSION['username']); ?>)</a>
                 <?php else: ?>
