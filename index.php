@@ -2,7 +2,7 @@
 // index.php - Home Page Module
 $pageTitle = "Home - COVID-19 Information & Awareness";
 
-require_once 'config/database.php';
+require_once __DIR__ . '/app/config/database.php';
 
 // Fetch Statistics and Info from Database if available
 $db = getDBConnection();
@@ -26,13 +26,13 @@ if ($dbConnected) {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include __DIR__ . '/app/includes/header.php'; ?>
 
 <!-- Database Warning Banner (Only shown if MySQL connection fails) -->
 <?php if (!$dbConnected): ?>
     <div class="container" style="margin-top: 20px;">
         <div class="db-status-banner warning">
-            <span>⚠️ <strong>Database Notice:</strong> MySQL Database not connected. Please start MySQL in XAMPP and import <code>sql/database.sql</code> in phpMyAdmin to activate dynamic database data.</span>
+            <span>⚠️ <strong>Database Notice:</strong> MySQL Database not connected. Please start MySQL in XAMPP and import <code>database/database.sql</code> in phpMyAdmin to activate dynamic database data.</span>
         </div>
     </div>
 <?php endif; ?>
@@ -51,8 +51,8 @@ if ($dbConnected) {
                 Access verified COVID-19 safety guidelines, global health statistics, prevention measures, and community awareness resources in one place.
             </p>
             <div class="hero-actions">
-                <a href="covid-info.php" class="btn btn-primary">Explore Information</a>
-                <a href="statistics.php" class="btn btn-outline">View Statistics</a>
+                <a href="<?php echo url('public/pages/covid/covid-info.php'); ?>" class="btn btn-primary">Explore Information</a>
+                <a href="<?php echo url('public/pages/covid/statistics.php'); ?>" class="btn btn-outline">View Statistics</a>
             </div>
         </div>
     </div>
@@ -114,7 +114,7 @@ if ($dbConnected) {
             <div class="cta-content">
                 <h2>📈 Country & Regional COVID-19 Statistics</h2>
                 <p>Explore comprehensive regional data, total recoveries, active case tracking, and mortality metrics across global territories in our dedicated statistical dashboard.</p>
-                <a href="statistics.php" class="btn btn-primary" style="margin-top: 15px;">Open Statistics Dashboard</a>
+                <a href="<?php echo url('public/pages/covid/statistics.php'); ?>" class="btn btn-primary" style="margin-top: 15px;">Open Statistics Dashboard</a>
             </div>
             <div class="cta-badge-icon">📊</div>
         </div>
@@ -154,4 +154,5 @@ if ($dbConnected) {
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/app/includes/footer.php'; ?>
+

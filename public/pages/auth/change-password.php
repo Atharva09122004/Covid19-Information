@@ -7,9 +7,9 @@
  * verification and password_hash() for new password storage.
  */
 
-// 1. Authentication middleware
-require_once 'includes/auth.php';
-require_once 'config/database.php';
+// 1. Authentication middleware & database
+require_once dirname(__DIR__, 3) . '/app/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 // 2. HTTP No-Cache headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $updateStmt->execute([$newHash, $userId]);
 
                     // Redirect to dashboard with success feedback
-                    header("Location: dashboard.php?msg=password_updated");
+                    header("Location: " . url('public/pages/user/dashboard.php?msg=password_updated'));
                     exit;
                 }
             } else {
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = "Change Password";
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -94,7 +94,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="change-password.php" method="POST" class="auth-form" id="changePasswordForm" novalidate>
+        <form action="<?php echo url('public/pages/auth/change-password.php'); ?>" method="POST" class="auth-form" id="changePasswordForm" novalidate>
             
             <!-- Current Password -->
             <div class="form-group">
@@ -149,10 +149,10 @@ include 'includes/header.php';
 
             <div class="form-actions-row" style="margin-top: 15px;">
                 <button type="submit" class="btn btn-primary btn-full">Update Password</button>
-                <a href="dashboard.php" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
+                <a href="<?php echo url('public/pages/user/dashboard.php'); ?>" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
             </div>
         </form>
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

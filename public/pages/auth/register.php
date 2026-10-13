@@ -8,7 +8,7 @@
 
 $pageTitle = "Create Your Account";
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 $errors = [];
 $successMessage = '';
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/header.php'; ?>
 
 <!-- Main Registration Section -->
 <section class="section">
@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Registration Form -->
-            <form action="register.php" method="POST" id="registerForm" class="auth-form" novalidate>
+            <form action="<?php echo url('public/pages/auth/register.php'); ?>" method="POST" id="registerForm" class="auth-form" novalidate>
                 
                 <!-- Row 1: Full Name & Email -->
                 <div class="form-row-2col">
@@ -305,4 +305,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
+<script src="<?php echo asset('js/validation.js'); ?>"></script>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

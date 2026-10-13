@@ -10,6 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once dirname(__DIR__) . '/helpers/helpers.php';
+
 // Check if user is logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_id'])) {
     // Send HTTP no-cache headers to prevent browser caching of protected content
@@ -18,7 +20,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset(
     header("Pragma: no-cache");
 
     // Redirect unauthorized user to login page
-    header("Location: login.php?error=auth_required");
+    header("Location: " . url('public/pages/auth/login.php?error=auth_required'));
     exit;
 }
 ?>

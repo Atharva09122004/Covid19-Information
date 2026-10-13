@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 $pageTitle = "Community Feedback";
 $errorMessage = "";
@@ -41,7 +41,7 @@ if (isset($_GET['msg'])) {
 // Handle New Comment Submission (Authenticated users only)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_comment') {
     if (!$isLoggedIn) {
-        header("Location: login.php?error=auth_required");
+        header("Location: " . url('public/pages/auth/login.php?error=auth_required'));
         exit;
     }
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt = $pdo->prepare("INSERT INTO comments (user_id, comment, created_at, updated_at) VALUES (?, ?, NOW(), NOW())");
                 $stmt->execute([$currentUserId, $commentInput]);
 
-                header("Location: comments.php?msg=comment_added");
+                header("Location: " . url('public/pages/community/comments.php?msg=comment_added'));
                 exit;
             } else {
                 $errorMessage = "Database connection failed. Please try again.";
@@ -95,7 +95,7 @@ try {
     error_log("Fetch Comments Error: " . $e->getMessage());
 }
 
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -132,7 +132,7 @@ include 'includes/header.php';
             </h3>
 
             <?php if ($isLoggedIn): ?>
-                <form action="comments.php" method="POST" class="auth-form" id="commentForm" novalidate>
+                <form action="<?php echo url('public/pages/community/comments.php'); ?>" method="POST" class="auth-form" id="commentForm" novalidate>
                     <input type="hidden" name="action" value="add_comment">
                     
                     <div class="form-group">
@@ -155,7 +155,7 @@ include 'includes/header.php';
                 </form>
             <?php else: ?>
                 <div class="guest-notice-box">
-                    <p>🔒 <strong>Want to share your feedback?</strong> Please <a href="login.php">Login</a> or <a href="register.php">Register</a> to post comments.</p>
+                    <p>🔒 <strong>Want to share your feedback?</strong> Please <a href="<?php echo url('public/pages/auth/login.php'); ?>">Login</a> or <a href="<?php echo url('public/pages/auth/register.php'); ?>">Register</a> to post comments.</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -204,8 +204,8 @@ include 'includes/header.php';
                             <!-- Show Edit/Delete Controls ONLY for current user's comments -->
                             <?php if ($isLoggedIn && (int)$item['user_id'] === $currentUserId): ?>
                                 <div class="comment-card-footer">
-                                    <a href="edit-comment.php?id=<?php echo $item['id']; ?>" class="btn-sm btn-edit">✏️ Edit</a>
-                                    <form action="delete-comment.php" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                    <a href="<?php echo url('public/pages/community/edit-comment.php?id=' . $item['id']); ?>" class="btn-sm btn-edit">✏️ Edit</a>
+                                    <form action="<?php echo url('public/pages/community/delete-comment.php'); ?>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this comment?');">
                                         <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
                                         <button type="submit" class="btn-sm btn-delete">🗑️ Delete</button>
                                     </form>
@@ -220,4 +220,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

@@ -11,13 +11,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
+
 // If already logged in, redirect directly to dashboard
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header("Location: dashboard.php");
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        header("Location: " . url('admin/dashboard.php'));
+    } else {
+        header("Location: " . url('public/pages/user/dashboard.php'));
+    }
     exit;
 }
-
-require_once 'config/database.php';
 
 $pageTitle = "Login";
 $errorMessage = "";
@@ -64,8 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['role']      = $user['role'];
                     $_SESSION['logged_in'] = true;
 
-                    // Redirect to protected dashboard page
-                    header("Location: dashboard.php");
+                    // Redirect to protected dashboard page or admin portal
+                    if ($user['role'] === 'admin') {
+                        header("Location: " . url('admin/dashboard.php'));
+                    } else {
+                        header("Location: " . url('public/pages/user/dashboard.php'));
+                    }
                     exit;
                 } else {
                     // Generic security message (prevents username enumeration)
@@ -79,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -102,7 +110,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="login.php" method="POST" class="auth-form" id="loginForm" novalidate>
+        <form action="<?php echo url('public/pages/auth/login.php'); ?>" method="POST" class="auth-form" id="loginForm" novalidate>
             <div class="form-group">
                 <label for="identifier" class="form-label">Username or Email <span class="required-star">*</span></label>
                 <input 
@@ -134,16 +142,16 @@ include 'includes/header.php';
 
             <div class="form-actions-row">
                 <button type="submit" class="btn btn-primary btn-full">Login</button>
-                <button type="reset" class="btn btn-outline" onclick="window.location.href='login.php'">Clear</button>
+                <button type="reset" class="btn btn-outline" onclick="window.location.href='<?php echo url('public/pages/auth/login.php'); ?>'">Clear</button>
             </div>
         </form>
 
         <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color);">
             <p style="color: var(--text-muted); font-size: 0.95rem;">
-                Don't have an account? <a href="register.php" style="color: var(--primary-color); font-weight: 700; text-decoration: underline;">Register here</a>
+                Don't have an account? <a href="<?php echo url('public/pages/auth/register.php'); ?>" style="color: var(--primary-color); font-weight: 700; text-decoration: underline;">Register here</a>
             </p>
         </div>
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

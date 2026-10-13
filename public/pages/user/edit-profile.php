@@ -7,9 +7,9 @@
  * Strictly uses session user_id to prevent IDOR attacks.
  */
 
-// 1. Authentication middleware
-require_once 'includes/auth.php';
-require_once 'config/database.php';
+// 1. Authentication middleware & database
+require_once dirname(__DIR__, 3) . '/app/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 // 2. HTTP No-Cache headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -43,7 +43,7 @@ try {
 }
 
 if (!$user) {
-    header("Location: dashboard.php");
+    header("Location: " . url('public/pages/user/dashboard.php'));
     exit;
 }
 
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['name'] = $name;
 
                 // Redirect to dashboard with success message
-                header("Location: dashboard.php?msg=profile_updated");
+                header("Location: " . url('public/pages/user/dashboard.php?msg=profile_updated'));
                 exit;
             } else {
                 $errorMessage = "Database connection error. Please try again.";
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = "Edit Profile";
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -110,7 +110,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="edit-profile.php" method="POST" class="auth-form" id="editProfileForm" novalidate>
+        <form action="<?php echo url('public/pages/user/edit-profile.php'); ?>" method="POST" class="auth-form" id="editProfileForm" novalidate>
             
             <!-- Read-only Email Field -->
             <div class="form-group">
@@ -184,10 +184,10 @@ include 'includes/header.php';
 
             <div class="form-actions-row" style="margin-top: 15px;">
                 <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
-                <a href="dashboard.php" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
+                <a href="<?php echo url('public/pages/user/dashboard.php'); ?>" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
             </div>
         </form>
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

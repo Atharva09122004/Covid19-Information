@@ -3,6 +3,7 @@
  * Admin Shared Footer (Module 9)
  * Project: COVID-19 Information and Awareness Website
  */
+require_once dirname(__DIR__, 2) . '/app/helpers/helpers.php';
 ?>
     <!-- Footer Section -->
     <footer class="site-footer" style="margin-top: 60px;">
@@ -14,7 +15,7 @@
     </footer>
 
     <!-- Main JavaScript -->
-    <script src="../js/validation.js"></script>
-    <script src="../js/main.js"></script>
+    <script src="<?php echo asset('js/validation.js'); ?>"></script>
+    <script src="<?php echo asset('js/main.js'); ?>"></script>
 </body>
 </html>

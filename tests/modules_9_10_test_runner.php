@@ -56,7 +56,7 @@ echo "========================================================\n";
 echo "MODULES 9 & 10 AUTOMATED TEST SUITE (ADMIN & CONTACT)\n";
 echo "========================================================\n\n";
 
-require_once __DIR__ . '/../config/database.php';
+require_once dirname(__DIR__) . '/app/config/database.php';
 $pdo = getDBConnection();
 
 // Setup Admin & Normal User Accounts
@@ -83,19 +83,19 @@ echo "--- PART 1: MODULE 9 (ADMIN DASHBOARD & MANAGEMENT TESTS) ---\n";
 
 // TC-ADMIN-03: Unauthenticated user accesses admin dashboard
 $resUnauth = httpGet($baseUrl . "admin/dashboard.php");
-$passUnauth = (strpos($resUnauth['header'], 'Location: ../login.php?error=auth_required') !== false || $resUnauth['code'] == 302);
+$passUnauth = (strpos($resUnauth['header'], 'login.php') !== false || $resUnauth['code'] == 302);
 echo "TC-ADMIN-03 (Unauthenticated access to admin dashboard): " . ($passUnauth ? "PASS [Redirected to login.php]" : "FAIL") . "\n";
 
 // Login Normal User
-httpPost($baseUrl . "login.php", ['identifier' => $norm_user, 'password' => $norm_pass], $cookieUser);
+httpPost($baseUrl . "public/pages/auth/login.php", ['identifier' => $norm_user, 'password' => $norm_pass], $cookieUser);
 
 // TC-ADMIN-02: Normal user accesses admin dashboard
 $resNormAdmin = httpGet($baseUrl . "admin/dashboard.php", $cookieUser);
-$passNormAdmin = (strpos($resNormAdmin['header'], 'Location: ../dashboard.php?error=admin_required') !== false || $resNormAdmin['code'] == 302);
+$passNormAdmin = (strpos($resNormAdmin['header'], 'dashboard.php') !== false || $resNormAdmin['code'] == 302);
 echo "TC-ADMIN-02 (Normal user accesses admin dashboard): " . ($passNormAdmin ? "PASS [Access denied - Redirected to dashboard.php]" : "FAIL") . "\n";
 
 // Login Admin User
-httpPost($baseUrl . "login.php", ['identifier' => $admin_user, 'password' => $admin_pass], $cookieAdmin);
+httpPost($baseUrl . "public/pages/auth/login.php", ['identifier' => $admin_user, 'password' => $admin_pass], $cookieAdmin);
 
 // TC-ADMIN-01: Admin accesses admin dashboard
 $resAdminDash = httpGet($baseUrl . "admin/dashboard.php", $cookieAdmin);
@@ -165,7 +165,7 @@ echo "TC-ADMIN-14 (Admin deletes comment): " . ($passDelCom ? "PASS [Comment del
 echo "--- PART 2: MODULE 10 (CONTACT US MODULE TESTS) ---\n";
 
 // TC-CONTACT-01 / TC-CONTACT-09: Guest submits valid contact form
-$resCnt01 = httpPost($baseUrl . "contact.php", ['name' => 'Jane Visitor', 'email' => 'jane@example.com', 'subject' => 'General Inquiry', 'message' => 'Hello, I have a detailed question regarding COVID guidelines.']);
+$resCnt01 = httpPost($baseUrl . "public/pages/contact.php", ['name' => 'Jane Visitor', 'email' => 'jane@example.com', 'subject' => 'General Inquiry', 'message' => 'Hello, I have a detailed question regarding COVID guidelines.']);
 $passCnt01 = (strpos($resCnt01['body'], 'Your message has been sent successfully') !== false);
 echo "TC-CONTACT-01 & 09 (Valid guest contact submission): " . ($passCnt01 ? "PASS [Message submitted successfully]" : "FAIL") . "\n";
 
@@ -173,23 +173,23 @@ echo "TC-CONTACT-01 & 09 (Valid guest contact submission): " . ($passCnt01 ? "PA
 $msgId = (int)$pdo->query("SELECT id FROM contact_messages WHERE email = 'jane@example.com' ORDER BY id DESC LIMIT 1")->fetchColumn();
 
 // TC-CONTACT-02: Empty name
-$resCnt02 = httpPost($baseUrl . "contact.php", ['name' => '', 'email' => 'jane@example.com', 'subject' => 'Test', 'message' => 'Hello, this is a test message.']);
+$resCnt02 = httpPost($baseUrl . "public/pages/contact.php", ['name' => '', 'email' => 'jane@example.com', 'subject' => 'Test', 'message' => 'Hello, this is a test message.']);
 $passCnt02 = (strpos($resCnt02['body'], 'Full Name is required') !== false);
 echo "TC-CONTACT-02 (Empty name validation): " . ($passCnt02 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-CONTACT-03: Invalid email
-$resCnt03 = httpPost($baseUrl . "contact.php", ['name' => 'Jane Visitor', 'email' => 'invalidemailformat', 'subject' => 'Test', 'message' => 'Hello, this is a test message.']);
+$resCnt03 = httpPost($baseUrl . "public/pages/contact.php", ['name' => 'Jane Visitor', 'email' => 'invalidemailformat', 'subject' => 'Test', 'message' => 'Hello, this is a test message.']);
 $passCnt03 = (strpos($resCnt03['body'], 'valid email address') !== false);
 echo "TC-CONTACT-03 (Invalid email validation): " . ($passCnt03 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-CONTACT-05: Message < 10 characters
-$resCnt05 = httpPost($baseUrl . "contact.php", ['name' => 'Jane Visitor', 'email' => 'jane@example.com', 'subject' => 'Test', 'message' => 'Short']);
+$resCnt05 = httpPost($baseUrl . "public/pages/contact.php", ['name' => 'Jane Visitor', 'email' => 'jane@example.com', 'subject' => 'Test', 'message' => 'Short']);
 $passCnt05 = (strpos($resCnt05['body'], 'at least 10 characters') !== false);
 echo "TC-CONTACT-05 (Message < 10 chars): " . ($passCnt05 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-CONTACT-08: XSS input in contact form
 $xssMsg = "<script>alert('XSS_CONTACT')</script>";
-httpPost($baseUrl . "contact.php", ['name' => 'XSS Tester', 'email' => 'xss@example.com', 'subject' => 'XSS Test', 'message' => 'Detailed message with ' . $xssMsg]);
+httpPost($baseUrl . "public/pages/contact.php", ['name' => 'XSS Tester', 'email' => 'xss@example.com', 'subject' => 'XSS Test', 'message' => 'Detailed message with ' . $xssMsg]);
 $resAdminMsgs = httpGet($baseUrl . "admin/contact-messages.php", $cookieAdmin);
 $passXssCnt = (strpos($resAdminMsgs['body'], htmlspecialchars($xssMsg, ENT_QUOTES, 'UTF-8')) !== false && strpos($resAdminMsgs['body'], "<script>alert") === false);
 echo "TC-CONTACT-08 (XSS defense in contact message): " . ($passXssCnt ? "PASS [XSS script safely escaped by htmlspecialchars]" : "FAIL") . "\n";

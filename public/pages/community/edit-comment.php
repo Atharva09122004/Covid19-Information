@@ -7,8 +7,8 @@
  * Security condition: WHERE id = ? AND user_id = ?
  */
 
-require_once 'includes/auth.php';
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -20,7 +20,7 @@ $errorMessage = "";
 $commentRow = null;
 
 if ($commentId <= 0) {
-    header("Location: comments.php?error=invalid_comment");
+    header("Location: " . url('public/pages/community/comments.php?error=invalid_comment'));
     exit;
 }
 
@@ -39,7 +39,7 @@ try {
 
 // Authorization Check: If comment does not exist or belong to this user -> DENY ACCESS
 if (!$commentRow) {
-    header("Location: comments.php?error=unauthorized");
+    header("Location: " . url('public/pages/community/comments.php?error=unauthorized'));
     exit;
 }
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updateStmt = $pdo->prepare("UPDATE comments SET comment = ?, updated_at = NOW() WHERE id = ? AND user_id = ?");
                 $updateStmt->execute([$commentText, $commentId, $userId]);
 
-                header("Location: comments.php?msg=comment_updated");
+                header("Location: " . url('public/pages/community/comments.php?msg=comment_updated'));
                 exit;
             } else {
                 $errorMessage = "Database connection error.";
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = "Edit Comment";
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -90,7 +90,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="edit-comment.php?id=<?php echo $commentId; ?>" method="POST" class="auth-form" id="editCommentForm" novalidate>
+        <form action="<?php echo url('public/pages/community/edit-comment.php?id=' . $commentId); ?>" method="POST" class="auth-form" id="editCommentForm" novalidate>
             <input type="hidden" name="id" value="<?php echo $commentId; ?>">
 
             <div class="form-group">
@@ -108,10 +108,10 @@ include 'includes/header.php';
 
             <div class="form-actions-row" style="margin-top: 15px;">
                 <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
-                <a href="comments.php" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
+                <a href="<?php echo url('public/pages/community/comments.php'); ?>" class="btn btn-outline" style="text-align: center; display: flex; align-items: center; justify-content: center;">Cancel</a>
             </div>
         </form>
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

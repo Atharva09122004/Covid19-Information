@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 2) . '/app/config/database.php';
 
 $pageTitle = "Contact Us";
 $errorMessage = "";
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include 'includes/header.php';
+include dirname(__DIR__, 2) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -113,7 +113,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="contact.php" method="POST" class="auth-form" id="contactForm" novalidate>
+        <form action="<?php echo url('public/pages/contact.php'); ?>" method="POST" class="auth-form" id="contactForm" novalidate>
             
             <div class="form-row-2col">
                 <div class="form-group">
@@ -182,4 +182,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 2) . '/app/includes/footer.php'; ?>

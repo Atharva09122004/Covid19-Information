@@ -8,7 +8,7 @@
 
 $pageTitle = "COVID-19 Information & Guidelines";
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 // Allowed categories for security validation
 $allowedCategories = [
@@ -76,7 +76,7 @@ function getCategoryIcon($cat) {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/header.php'; ?>
 
 <!-- Main Section -->
 <section class="section">
@@ -190,4 +190,4 @@ function getCategoryIcon($cat) {
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

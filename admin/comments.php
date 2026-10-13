@@ -7,8 +7,8 @@
  * inappropriate feedback using POST requests and prepared statements.
  */
 
-require_once '../includes/admin-auth.php';
-require_once '../config/database.php';
+require_once dirname(__DIR__) . '/app/includes/admin-auth.php';
+require_once dirname(__DIR__) . '/app/config/database.php';
 
 $errorMessage = "";
 $successMessage = "";

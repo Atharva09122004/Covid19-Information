@@ -8,7 +8,7 @@
 
 $pageTitle = "COVID-19 Statistics Dashboard";
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 // Allowed list of countries for GET parameter security validation
 $allowedCountries = [
@@ -97,7 +97,7 @@ function getCountryFlag($countryName) {
 }
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/header.php'; ?>
 
 <!-- Main Section -->
 <section class="section">
@@ -252,4 +252,4 @@ function getCountryFlag($countryName) {
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

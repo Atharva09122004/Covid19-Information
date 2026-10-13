@@ -6,6 +6,9 @@
  * Uses PHP Data Objects (PDO) for secure and efficient database operations.
  */
 
+// Automatically load helper functions if not already loaded
+require_once dirname(__DIR__) . '/helpers/helpers.php';
+
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
@@ -30,7 +33,6 @@ function getDBConnection() {
             
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            // Log or handle error cleanly for development/testing
             error_log("Database Connection Error: " . $e->getMessage());
             return null;
         }

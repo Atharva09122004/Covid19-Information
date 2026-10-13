@@ -7,8 +7,8 @@
  * Security condition: DELETE FROM comments WHERE id = ? AND user_id = ?
  */
 
-require_once 'includes/auth.php';
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($commentId <= 0) {
-    header("Location: comments.php?error=invalid_comment");
+    header("Location: " . url('public/pages/community/comments.php?error=invalid_comment'));
     exit;
 }
 
@@ -38,17 +38,17 @@ try {
         $stmt->execute([$commentId, $userId]);
 
         if ($stmt->rowCount() > 0) {
-            header("Location: comments.php?msg=comment_deleted");
+            header("Location: " . url('public/pages/community/comments.php?msg=comment_deleted'));
             exit;
         } else {
             // Deletion failed because comment does not exist or belongs to another user
-            header("Location: comments.php?error=unauthorized");
+            header("Location: " . url('public/pages/community/comments.php?error=unauthorized'));
             exit;
         }
     }
 } catch (PDOException $e) {
     error_log("Delete Comment Error: " . $e->getMessage());
-    header("Location: comments.php?error=system_error");
+    header("Location: " . url('public/pages/community/comments.php?error=system_error'));
     exit;
 }
 ?>

@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 $pageTitle = "Search COVID-19 Information";
 $searchQuery = trim($_GET['q'] ?? '');
@@ -45,7 +45,7 @@ if ($searchQuery !== '') {
     }
 }
 
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -57,7 +57,7 @@ include 'includes/header.php';
             <h1 class="search-title">Search COVID-19 Information</h1>
             <p class="search-subtitle">Search articles, symptoms, prevention tips, vaccination info, and safety guidelines.</p>
 
-            <form action="search.php" method="GET" class="search-form" id="searchForm">
+            <form action="<?php echo url('public/pages/covid/search.php'); ?>" method="GET" class="search-form" id="searchForm">
                 <div class="search-input-wrapper">
                     <input 
                         type="text" 
@@ -114,7 +114,7 @@ include 'includes/header.php';
                             <p class="card-desc"><?php echo htmlspecialchars($item['description']); ?></p>
 
                             <div style="margin-top: 20px;">
-                                <a href="covid-info.php?category=<?php echo urlencode($item['category']); ?>" class="btn-sm btn-outline">
+                                <a href="<?php echo url('public/pages/covid/covid-info.php?category=' . urlencode($item['category'])); ?>" class="btn-sm btn-outline">
                                     📖 View Category
                                 </a>
                             </div>
@@ -127,4 +127,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

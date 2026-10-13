@@ -7,8 +7,8 @@
  */
 
 // 1. Enforce authentication middleware
-require_once 'includes/auth.php';
-require_once 'config/database.php';
+require_once dirname(__DIR__, 3) . '/app/includes/auth.php';
+require_once dirname(__DIR__, 3) . '/app/config/database.php';
 
 // 2. HTTP No-Cache headers to prevent caching sensitive user data
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -58,7 +58,7 @@ if (!$user) {
 }
 
 $pageTitle = "User Dashboard";
-include 'includes/header.php';
+include dirname(__DIR__, 3) . '/app/includes/header.php';
 ?>
 
 <main class="container section">
@@ -127,7 +127,7 @@ include 'includes/header.php';
                 </div>
 
                 <div class="panel-card-actions">
-                    <a href="edit-profile.php" class="btn btn-primary btn-full">✏️ Edit Profile</a>
+                    <a href="<?php echo url('public/pages/user/edit-profile.php'); ?>" class="btn btn-primary btn-full">✏️ Edit Profile</a>
                 </div>
             </div>
 
@@ -174,8 +174,8 @@ include 'includes/header.php';
                     </div>
 
                     <div class="security-actions-box">
-                        <a href="change-password.php" class="btn btn-outline btn-full">🔑 Change Password</a>
-                        <a href="logout.php" class="btn btn-logout btn-full">🔒 Logout Account</a>
+                        <a href="<?php echo url('public/pages/auth/change-password.php'); ?>" class="btn btn-outline btn-full">🔑 Change Password</a>
+                        <a href="<?php echo url('public/pages/auth/logout.php'); ?>" class="btn btn-logout btn-full">🔒 Logout Account</a>
                     </div>
                 </div>
 
@@ -185,4 +185,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include dirname(__DIR__, 3) . '/app/includes/footer.php'; ?>

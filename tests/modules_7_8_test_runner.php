@@ -56,7 +56,7 @@ echo "========================================================\n";
 echo "MODULES 7 & 8 AUTOMATED TEST SUITE (COMMENTS & SEARCH)\n";
 echo "========================================================\n\n";
 
-require_once __DIR__ . '/../config/database.php';
+require_once dirname(__DIR__) . '/app/config/database.php';
 $pdo = getDBConnection();
 
 // Setup User A and User B
@@ -86,10 +86,10 @@ echo "[SETUP] Created User A ($userA_user, ID $userA_id) & User B ($userB_user, 
 echo "--- PART 1: MODULE 7 (COMMENTS & FEEDBACK TESTS) ---\n";
 
 // Login User A
-httpPost($baseUrl . "login.php", ['identifier' => $userA_user, 'password' => $userA_pass], $cookieFileA);
+httpPost($baseUrl . "public/pages/auth/login.php", ['identifier' => $userA_user, 'password' => $userA_pass], $cookieFileA);
 
 // TC-COM-01: User A adds valid comment
-$resCom01 = httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => 'This is a test comment by User Alpha.'], $cookieFileA);
+$resCom01 = httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => 'This is a test comment by User Alpha.'], $cookieFileA);
 $passCom01 = (strpos($resCom01['header'], 'comments.php?msg=comment_added') !== false || $resCom01['code'] == 302);
 echo "TC-COM-01 (Add valid comment): " . ($passCom01 ? "PASS [Comment created & redirected]" : "FAIL") . "\n";
 
@@ -99,96 +99,96 @@ $stmtComA->execute([$userA_id]);
 $comA_id = $stmtComA->fetchColumn();
 
 // TC-COM-02: Empty comment
-$resCom02 = httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => ''], $cookieFileA);
+$resCom02 = httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => ''], $cookieFileA);
 $passCom02 = (strpos($resCom02['body'], 'at least 3 characters') !== false);
 echo "TC-COM-02 (Empty comment): " . ($passCom02 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-COM-03: Comment with only spaces
-$resCom03 = httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => '     '], $cookieFileA);
+$resCom03 = httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => '     '], $cookieFileA);
 $passCom03 = (strpos($resCom03['body'], 'at least 3 characters') !== false);
 echo "TC-COM-03 (Whitespace comment): " . ($passCom03 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-COM-04: Comment shorter than 3 characters
-$resCom04 = httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => 'Hi'], $cookieFileA);
+$resCom04 = httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => 'Hi'], $cookieFileA);
 $passCom04 = (strpos($resCom04['body'], 'at least 3 characters') !== false);
 echo "TC-COM-04 (Comment <3 chars): " . ($passCom04 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-COM-05: Comment longer than 1000 characters
 $longComment = str_repeat("A", 1001);
-$resCom05 = httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => $longComment], $cookieFileA);
+$resCom05 = httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => $longComment], $cookieFileA);
 $passCom05 = (strpos($resCom05['body'], 'cannot exceed 1000 characters') !== false);
 echo "TC-COM-05 (Comment >1000 chars): " . ($passCom05 ? "PASS [Validation error displayed]" : "FAIL") . "\n";
 
 // TC-COM-10: XSS payload comment
 $xssPayload = "<script>alert('XSS_TEST')</script>";
-httpPost($baseUrl . "comments.php", ['action' => 'add_comment', 'comment' => $xssPayload], $cookieFileA);
-$resFeed = httpGet($baseUrl . "comments.php");
+httpPost($baseUrl . "public/pages/community/comments.php", ['action' => 'add_comment', 'comment' => $xssPayload], $cookieFileA);
+$resFeed = httpGet($baseUrl . "public/pages/community/comments.php");
 $passXss = (strpos($resFeed['body'], htmlspecialchars($xssPayload, ENT_QUOTES, 'UTF-8')) !== false && strpos($resFeed['body'], "<script>alert") === false);
 echo "TC-COM-10 (Stored XSS defense): " . ($passXss ? "PASS [XSS script safely escaped by htmlspecialchars]" : "FAIL") . "\n";
 
 // TC-COM-06: User A edits own comment
-$resCom06 = httpPost($baseUrl . "edit-comment.php?id=" . $comA_id, ['id' => $comA_id, 'comment' => 'Updated comment text by User Alpha.'], $cookieFileA);
+$resCom06 = httpPost($baseUrl . "public/pages/community/edit-comment.php?id=" . $comA_id, ['id' => $comA_id, 'comment' => 'Updated comment text by User Alpha.'], $cookieFileA);
 $passCom06 = (strpos($resCom06['header'], 'comments.php?msg=comment_updated') !== false || $resCom06['code'] == 302);
 echo "TC-COM-06 (User A edits own comment): " . ($passCom06 ? "PASS [Comment updated successfully]" : "FAIL") . "\n";
 
 // Login User B
-httpPost($baseUrl . "login.php", ['identifier' => $userB_user, 'password' => $userB_pass], $cookieFileB);
+httpPost($baseUrl . "public/pages/auth/login.php", ['identifier' => $userB_user, 'password' => $userB_pass], $cookieFileB);
 
 // TC-COM-08: User B attempts to edit User A's comment
-$resCom08 = httpGet($baseUrl . "edit-comment.php?id=" . $comA_id, $cookieFileB);
+$resCom08 = httpGet($baseUrl . "public/pages/community/edit-comment.php?id=" . $comA_id, $cookieFileB);
 $passCom08 = (strpos($resCom08['header'], 'error=unauthorized') !== false || $resCom08['code'] == 302);
 echo "TC-COM-08 (User B attempts to edit User A's comment): " . ($passCom08 ? "PASS [Access denied - Redirected with error=unauthorized]" : "FAIL") . "\n";
 
 // TC-COM-09: User B attempts to delete User A's comment
-$resCom09 = httpPost($baseUrl . "delete-comment.php", ['id' => $comA_id], $cookieFileB);
+$resCom09 = httpPost($baseUrl . "public/pages/community/delete-comment.php", ['id' => $comA_id], $cookieFileB);
 $passCom09 = (strpos($resCom09['header'], 'error=unauthorized') !== false || $resCom09['code'] == 302);
 echo "TC-COM-09 (User B attempts to delete User A's comment): " . ($passCom09 ? "PASS [Deletion denied - Redirected with error=unauthorized]" : "FAIL") . "\n";
 
 // TC-COM-07: User A deletes own comment
-$resCom07 = httpPost($baseUrl . "delete-comment.php", ['id' => $comA_id], $cookieFileA);
+$resCom07 = httpPost($baseUrl . "public/pages/community/delete-comment.php", ['id' => $comA_id], $cookieFileA);
 $passCom07 = (strpos($resCom07['header'], 'comments.php?msg=comment_deleted') !== false || $resCom07['code'] == 302);
 echo "TC-COM-07 (User A deletes own comment): " . ($passCom07 ? "PASS [Comment deleted successfully]" : "FAIL") . "\n\n";
 
 echo "--- PART 2: MODULE 8 (SEARCH MODULE TESTS) ---\n";
 
 // TC-SEARCH-01: Search "symptoms"
-$resSr01 = httpGet($baseUrl . "search.php?q=symptoms");
+$resSr01 = httpGet($baseUrl . "public/pages/covid/search.php?q=symptoms");
 $passSr01 = (strpos($resSr01['body'], 'Common Symptoms') !== false || strpos($resSr01['body'], 'Symptoms') !== false);
 echo "TC-SEARCH-01 (Search 'symptoms'): " . ($passSr01 ? "PASS [Relevant symptom cards returned]" : "FAIL") . "\n";
 
 // TC-SEARCH-02: Search "prevention"
-$resSr02 = httpGet($baseUrl . "search.php?q=prevention");
+$resSr02 = httpGet($baseUrl . "public/pages/covid/search.php?q=prevention");
 $passSr02 = (strpos($resSr02['body'], 'Hand Hygiene') !== false || strpos($resSr02['body'], 'Prevention') !== false);
 echo "TC-SEARCH-02 (Search 'prevention'): " . ($passSr02 ? "PASS [Relevant prevention cards returned]" : "FAIL") . "\n";
 
 // TC-SEARCH-03: Search non-existent term
-$resSr03 = httpGet($baseUrl . "search.php?q=xyznonexistentterm999");
+$resSr03 = httpGet($baseUrl . "public/pages/covid/search.php?q=xyznonexistentterm999");
 $passSr03 = (strpos($resSr03['body'], 'No Matching COVID-19 Information Found') !== false);
 echo "TC-SEARCH-03 (Search non-existent term): " . ($passSr03 ? "PASS [No-results message displayed]" : "FAIL") . "\n";
 
 // TC-SEARCH-04: Empty search
-$resSr04 = httpGet($baseUrl . "search.php?q=");
+$resSr04 = httpGet($baseUrl . "public/pages/covid/search.php?q=");
 $passSr04 = (strpos($resSr04['body'], 'Enter a Keyword to Search') !== false);
 echo "TC-SEARCH-04 (Empty search): " . ($passSr04 ? "PASS [Search prompt message displayed]" : "FAIL") . "\n";
 
 // TC-SEARCH-05: Search with spaces
-$resSr05 = httpGet($baseUrl . "search.php?q=%20%20symptoms%20%20");
+$resSr05 = httpGet($baseUrl . "public/pages/covid/search.php?q=%20%20symptoms%20%20");
 $passSr05 = (strpos($resSr05['body'], 'Common Symptoms') !== false);
 echo "TC-SEARCH-05 (Search with surrounding spaces): " . ($passSr05 ? "PASS [Input trimmed & executed]" : "FAIL") . "\n";
 
 // TC-SEARCH-08: SQL injection-style search input
-$resSr08 = httpGet($baseUrl . "search.php?q=" . urlencode("' OR '1'='1"));
+$resSr08 = httpGet($baseUrl . "public/pages/covid/search.php?q=" . urlencode("' OR '1'='1"));
 $passSr08 = (strpos($resSr08['body'], 'No Matching COVID-19 Information Found') !== false || $resSr08['code'] == 200);
 echo "TC-SEARCH-08 (SQL injection defense in search): " . ($passSr08 ? "PASS [Prepared statement executed safely without SQLi]" : "FAIL") . "\n";
 
 // TC-SEARCH-09: XSS-style search input
 $xssSrPayload = "<script>alert('XSS_SEARCH')</script>";
-$resSr09 = httpGet($baseUrl . "search.php?q=" . urlencode($xssSrPayload));
+$resSr09 = httpGet($baseUrl . "public/pages/covid/search.php?q=" . urlencode($xssSrPayload));
 $passSr09 = (strpos($resSr09['body'], htmlspecialchars($xssSrPayload, ENT_QUOTES, 'UTF-8')) !== false && strpos($resSr09['body'], "<script>alert") === false);
 echo "TC-SEARCH-09 (XSS defense in search input display): " . ($passSr09 ? "PASS [Search term safely escaped by htmlspecialchars]" : "FAIL") . "\n";
 
 // TC-SEARCH-10: Case-insensitive search
-$resSr10 = httpGet($baseUrl . "search.php?q=SYMPTOMS");
+$resSr10 = httpGet($baseUrl . "public/pages/covid/search.php?q=SYMPTOMS");
 $passSr10 = (strpos($resSr10['body'], 'Common Symptoms') !== false);
 echo "TC-SEARCH-10 (Case-insensitive search 'SYMPTOMS'): " . ($passSr10 ? "PASS [Matching results returned]" : "FAIL") . "\n";
 

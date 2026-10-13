@@ -1,0 +1,24 @@
+# ========================================================
+# COVID-19 Information Portal - Git Attributes
+# ========================================================
+
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Explicit text files
+*.php text diff=php
+*.css text diff=css
+*.js text
+*.sql text
+*.md text
+*.json text
+*.yml text
+*.yaml text
+
+# Binary files
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.pdf binary

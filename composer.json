@@ -1,0 +1,38 @@
+{
+  "name": "atharva/covid19-information",
+  "description": "COVID-19 Information and Awareness Web Portal - Full-Stack PHP & STQA Quality Assurance Project",
+  "type": "project",
+  "keywords": [
+    "covid-19",
+    "healthcare",
+    "stqa",
+    "software-testing",
+    "quality-assurance",
+    "php",
+    "mysql",
+    "owasp",
+    "security"
+  ],
+  "homepage": "https://github.com/Atharva09122004/Covid19-Information",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Atharva",
+      "role": "Lead Developer & QA Engineer"
+    }
+  ],
+  "require": {
+    "php": "^8.0"
+  },
+  "scripts": {
+    "test": "php tests/master_test_runner.php",
+    "test:auth": "php tests/module5_test_runner.php",
+    "test:profile": "php tests/module6_test_runner.php",
+    "test:community": "php tests/modules_7_8_test_runner.php",
+    "test:admin": "php tests/modules_9_10_test_runner.php"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

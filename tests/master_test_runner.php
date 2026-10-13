@@ -52,7 +52,7 @@ function httpGet($url, $cookieFile = null) {
     return ['code' => $httpCode, 'header' => $header, 'body' => $body];
 }
 
-require_once __DIR__ . '/../config/database.php';
+require_once dirname(__DIR__) . '/app/config/database.php';
 $pdo = getDBConnection();
 
 echo "========================================================\n";
@@ -82,21 +82,21 @@ reportResult("TC-HOME-004", "Hero Call to Action Button", strpos($resHome['body'
 reportResult("TC-HOME-005", "Prevention Highlights Rendered", strpos($resHome['body'], 'Wash Hands') !== false || strpos($resHome['body'], 'Prevention') !== false || strpos($resHome['body'], 'Protection') !== false);
 
 // 2. COVID Info Tests
-$resInfo = httpGet($baseUrl . "covid-info.php");
+$resInfo = httpGet($baseUrl . "public/pages/covid/covid-info.php");
 reportResult("TC-INFO-001", "COVID Info Page Loads", $resInfo['code'] == 200 && strpos($resInfo['body'], 'COVID-19 Information') !== false);
 reportResult("TC-INFO-002", "Category Filter Rendered", strpos($resInfo['body'], 'category-filter-box') !== false);
-reportResult("TC-INFO-003", "Filter by Symptoms Category", strpos(httpGet($baseUrl . "covid-info.php?category=Symptoms")['body'], 'Symptoms') !== false);
-reportResult("TC-INFO-004", "Filter by Prevention Category", strpos(httpGet($baseUrl . "covid-info.php?category=Prevention")['body'], 'Prevention') !== false);
-reportResult("TC-INFO-005", "All Category View Option", strpos(httpGet($baseUrl . "covid-info.php?category=All")['body'], 'COVID-19 Information') !== false);
+reportResult("TC-INFO-003", "Filter by Symptoms Category", strpos(httpGet($baseUrl . "public/pages/covid/covid-info.php?category=Symptoms")['body'], 'Symptoms') !== false);
+reportResult("TC-INFO-004", "Filter by Prevention Category", strpos(httpGet($baseUrl . "public/pages/covid/covid-info.php?category=Prevention")['body'], 'Prevention') !== false);
+reportResult("TC-INFO-005", "All Category View Option", strpos(httpGet($baseUrl . "public/pages/covid/covid-info.php?category=All")['body'], 'COVID-19 Information') !== false);
 
 // 3. COVID Statistics Tests
-$resStats = httpGet($baseUrl . "statistics.php");
+$resStats = httpGet($baseUrl . "public/pages/covid/statistics.php");
 reportResult("TC-STAT-001", "Statistics Page Loads", $resStats['code'] == 200 && strpos($resStats['body'], 'Statistics') !== false);
 reportResult("TC-STAT-002", "Global Summary Cards Present", strpos($resStats['body'], 'Total Cases') !== false);
 reportResult("TC-STAT-003", "State Data Table Rendered", strpos($resStats['body'], 'table') !== false);
 reportResult("TC-STAT-004", "Country Filter Dropdown Present", strpos($resStats['body'], 'country') !== false || strpos($resStats['body'], 'Country') !== false);
-reportResult("TC-STAT-005", "Sort Parameter Handling", strpos(httpGet($baseUrl . "statistics.php?sort=cases_desc")['body'], 'table') !== false);
-reportResult("TC-STAT-006", "Filter by Specific State", strpos(httpGet($baseUrl . "statistics.php?state=Maharashtra")['body'], 'Maharashtra') !== false || $resStats['code'] == 200);
+reportResult("TC-STAT-005", "Sort Parameter Handling", strpos(httpGet($baseUrl . "public/pages/covid/statistics.php?sort=cases_desc")['body'], 'table') !== false);
+reportResult("TC-STAT-006", "Filter by Specific State", strpos(httpGet($baseUrl . "public/pages/covid/statistics.php?state=Maharashtra")['body'], 'Maharashtra') !== false || $resStats['code'] == 200);
 reportResult("TC-STAT-007", "Active Cases Calculation Display", strpos($resStats['body'], 'Active') !== false);
 reportResult("TC-STAT-008", "Recovery Rate Metric Display", strpos($resStats['body'], 'Discharged') !== false || strpos($resStats['body'], 'Recovered') !== false || $resStats['code'] == 200);
 
@@ -105,7 +105,7 @@ $testUser = "master_user_" . time();
 $testEmail = $testUser . "@example.com";
 $testPass = "MasterPass123!";
 
-$resRegValid = httpPost($baseUrl . "register.php", [
+$resRegValid = httpPost($baseUrl . "public/pages/auth/register.php", [
     'name' => 'Master Test User',
     'email' => $testEmail,
     'mobile' => '9876543210',
@@ -116,7 +116,7 @@ $resRegValid = httpPost($baseUrl . "register.php", [
 ]);
 reportResult("TC-REG-001", "Valid User Registration", strpos($resRegValid['body'], 'Registration successful') !== false || strpos($resRegValid['header'], 'login.php') !== false);
 
-$resRegDup = httpPost($baseUrl . "register.php", [
+$resRegDup = httpPost($baseUrl . "public/pages/auth/register.php", [
     'name' => 'Master Test User',
     'email' => $testEmail,
     'mobile' => '9876543210',
@@ -128,23 +128,23 @@ $resRegDup = httpPost($baseUrl . "register.php", [
 reportResult("TC-REG-002", "Duplicate Username Rejection", strpos($resRegDup['body'], 'already taken') !== false || strpos($resRegDup['body'], 'already exists') !== false);
 
 // 5. Authentication & Login Tests
-$resLogin = httpPost($baseUrl . "login.php", [
+$resLogin = httpPost($baseUrl . "public/pages/auth/login.php", [
     'identifier' => $testUser,
     'password' => $testPass
 ], $cookieUser);
 reportResult("TC-AUTH-001", "Valid User Login", strpos($resLogin['header'], 'dashboard.php') !== false || $resLogin['code'] == 302);
 
-$resBadLogin = httpPost($baseUrl . "login.php", [
+$resBadLogin = httpPost($baseUrl . "public/pages/auth/login.php", [
     'identifier' => $testUser,
     'password' => 'WrongPassword!'
 ]);
 reportResult("TC-AUTH-002", "Invalid Password Login Rejection", strpos($resBadLogin['body'], 'Invalid username/email or password') !== false);
 
 // 6. User Dashboard & Profile Tests
-$resDash = httpGet($baseUrl . "dashboard.php", $cookieUser);
+$resDash = httpGet($baseUrl . "public/pages/user/dashboard.php", $cookieUser);
 reportResult("TC-DASH-001", "Authenticated User Access Dashboard", strpos($resDash['body'], 'DASHBOARD') !== false || strpos($resDash['body'], 'Dashboard') !== false);
 
-$resEditProf = httpPost($baseUrl . "edit-profile.php", [
+$resEditProf = httpPost($baseUrl . "public/pages/user/edit-profile.php", [
     'name' => 'Master User Updated',
     'mobile' => '9998887776',
     'gender' => 'Male'
@@ -152,18 +152,18 @@ $resEditProf = httpPost($baseUrl . "edit-profile.php", [
 reportResult("TC-DASH-002", "Profile Update Operation", strpos($resEditProf['header'], 'dashboard.php?msg=profile_updated') !== false || $resEditProf['code'] == 302);
 
 // 7. Comments Tests
-$resPostComm = httpPost($baseUrl . "comments.php", [
+$resPostComm = httpPost($baseUrl . "public/pages/community/comments.php", [
     'action' => 'add_comment',
     'comment' => 'Master test comment text for QA validation.'
 ], $cookieUser);
 reportResult("TC-COMM-001", "Post New Comment", strpos($resPostComm['header'], 'comments.php?msg=comment_added') !== false || $resPostComm['code'] == 302);
 
 // 8. Search Tests
-$resSearch = httpGet($baseUrl . "search.php?q=Vaccine");
+$resSearch = httpGet($baseUrl . "public/pages/covid/search.php?q=Vaccine");
 reportResult("TC-SRCH-001", "Search Execution with Keyword", strpos($resSearch['body'], 'Search Results') !== false || strpos($resSearch['body'], 'search') !== false);
 
 // 9. Contact Us Tests
-$resContact = httpPost($baseUrl . "contact.php", [
+$resContact = httpPost($baseUrl . "public/pages/contact.php", [
     'name' => 'Master Contact Tester',
     'email' => 'contact_master@example.com',
     'subject' => 'Master System Test Query',
@@ -172,7 +172,7 @@ $resContact = httpPost($baseUrl . "contact.php", [
 reportResult("TC-CONT-001", "Submit Guest Contact Message", strpos($resContact['body'], 'Your message has been sent successfully') !== false);
 
 // 10. Admin Access & Management Tests
-httpPost($baseUrl . "login.php", [
+httpPost($baseUrl . "public/pages/auth/login.php", [
     'identifier' => 'admin',
     'password' => 'AdminPass123!'
 ], $cookieAdmin);
@@ -184,7 +184,7 @@ $resAdminUsers = httpGet($baseUrl . "admin/users.php", $cookieAdmin);
 reportResult("TC-ADMIN-002", "Admin Manage Users View", strpos($resAdminUsers['body'], 'Users') !== false || strpos($resAdminUsers['body'], 'users') !== false);
 
 // Security Tests
-$resSqlInj = httpPost($baseUrl . "login.php", [
+$resSqlInj = httpPost($baseUrl . "public/pages/auth/login.php", [
     'identifier' => "' OR '1'='1",
     'password' => "' OR '1'='1"
 ]);
@@ -193,8 +193,13 @@ reportResult("TC-SEC-001", "SQL Injection Login Prevention", strpos($resSqlInj['
 $resUnauthAdmin = httpGet($baseUrl . "admin/dashboard.php", $cookieUser);
 reportResult("TC-SEC-002", "Normal User Restricted from Admin", strpos($resUnauthAdmin['header'], 'dashboard.php?error=admin_required') !== false || $resUnauthAdmin['code'] == 302);
 
+// Clean up temporary cookie jar files
+if (file_exists($cookieAdmin)) @unlink($cookieAdmin);
+if (file_exists($cookieUser))  @unlink($cookieUser);
+
 echo "\n========================================================\n";
 echo "SUMMARY RESULTS:\n";
 echo "Passed: $passCount\n";
 echo "Failed: $failCount\n";
 echo "========================================================\n";
+
